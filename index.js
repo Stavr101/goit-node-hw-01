@@ -1,12 +1,12 @@
-// const argv = require("yargs").argv;
+const { program } = require("commander");
 
 const contactsOperations = require("./contacts");
 
-// TODO: рефакторить
-const invokeAction = async ({ action, id, data }) => {
+const invokeAction = async ({ action, id, name, email, phone }) => {
   switch (action) {
     case "list":
       const contacts = await contactsOperations.listContacts();
+      console.log(contacts);
       break;
 
     case "get":
@@ -14,10 +14,15 @@ const invokeAction = async ({ action, id, data }) => {
       if (!contact) {
         throw new Error(`Contact with id=${id} not found`);
       }
+      console.log(contact);
       break;
 
     case "add":
-      const newContact = await contactsOperations.addContact(data);
+      const newContact = await contactsOperations.addContact(
+        name,
+        email,
+        phone
+      );
       console.log(newContact);
       break;
 
@@ -30,18 +35,15 @@ const invokeAction = async ({ action, id, data }) => {
       console.warn("\x1B[31m Unknown action type!");
   }
 };
-// invokeAction({ action: "list" });
-// const id = "5";
-// invokeAction({ action: "get", id });
-// invokeAction(argv);
 
-const newContact = {
-  name: " Lucas Films",
-  email: "nec1111111@Nulla.com",
-  phone: "(111) 111-1111",
-};
+program
+  .option("-a, --action <type> ", "contacts operation")
+  .option("-i, --id <type>", "contact id")
+  .option("-n, --name <type>", "contact name")
+  .option("-e, --email <type>", "contact email")
+  .option("-p, --phone <type>", "contact phone");
 
-// invokeAction({ action: "add", data: newContact });
-const removeById = "4400db8b-89e9-4b91-9c4c-13904d6bf24e";
+program.parse(process.argv);
+const options = program.opts();
 
-invokeAction({ action: "remove", id: removeById });
+invokeAction(options);
